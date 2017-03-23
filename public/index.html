@@ -6,40 +6,38 @@
 
 	<script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
 	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
-	 crossorigin="anonymous"></script>
+	    crossorigin="anonymous"></script>
 	<script src="index.js"></script>
 
 </head>
 
 <body>
 	<div>
-		Add User:
-		<input id="email" value="email" type="text" placeholder="email">
-		<input id="primerNombre" value="primer" type="text" placeholder="primerNombre">
-		<input id="apellido" value="apellido" type="text" placeholder="apellido">
-		<input id="lugarPreferido" value="1" type="number" min="0" max="2">
+		<input id="email" value="juan@test.com" type="text" placeholder="email"></br>
+		<input id="primerNombre" value="Juan" type="text" placeholder="Primer Nombre"></br>
+		<input id="apellido" value="Herrera" type="text" placeholder="apellido"></br>
+		<input id="lugarPreferido" value="1" type="number" min="0" max="2"></br>
 		<button id="addUser">Add User</button>
 	</div>
 	<div>
-		Add Match:
 		<select id="matchLeft" class="user-list"></select>
 		<select id="matchRight" class="user-list"></select>
 		<button id="addMatch">Add Match</button>
 	</div>
 	<div>
-		Fetch matches per User:
-		<select id="fetchMatches" class="user-list"></select>
-		<button id="showMatches">Fetch Matches</button>
+		<select id="userToFetchMatchesFrom" class="user-list"></select>
+		<button id="fetchMatchesPerUser">Fetch Matches Per User</button>
 		<ul id="userMatches"></ul>
 	</div>
 	<div>
-		Generate Matches:
 		<button id="generateMatches">Generate Matches</button>
-		<ul id="generatedMatches"></ul>
+		<button id="fetchCurrentMatches">Fetch Current Matches</button>
+		<ul id="currentMatches"></ul>
 	</div>
 	<div>
-		Restart Matches:
-		<button id="restartMatches">Restart Matches</button>
+		<textarea id="mailTemplate" rows="4" cols="50">
+		At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies. 
+		</textarea>
 	</div>
 
 </body>
