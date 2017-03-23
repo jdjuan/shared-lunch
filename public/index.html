@@ -1,22 +1,47 @@
 <html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>Document</title>
-  
-<script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
-<script
-  src="https://code.jquery.com/jquery-3.1.1.slim.min.js"
-  integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
-  crossorigin="anonymous"></script>
-<script src="index.js"></script>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
+	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
+	 crossorigin="anonymous"></script>
+	<script src="index.js"></script>
 
 </head>
+
 <body>
-  <input id="skype" type="text" placeholder="skype">
-  <input id="email" type="text" placeholder="email">
-  <input id="primerNombre" type="text" placeholder="primerNombre">
-  <input id="apellido" type="text" placeholder="apellido">
-  <input id="lugar" type="number" min="0" max="2">
-  <button id="addUser">Add User</button>
+	<div>
+		Add User:
+		<input id="email" value="email" type="text" placeholder="email">
+		<input id="primerNombre" value="primer" type="text" placeholder="primerNombre">
+		<input id="apellido" value="apellido" type="text" placeholder="apellido">
+		<input id="lugarPreferido" value="1" type="number" min="0" max="2">
+		<button id="addUser">Add User</button>
+	</div>
+	<div>
+		Add Match:
+		<select id="matchLeft" class="user-list"></select>
+		<select id="matchRight" class="user-list"></select>
+		<button id="addMatch">Add Match</button>
+	</div>
+	<div>
+		Fetch matches per User:
+		<select id="fetchMatches" class="user-list"></select>
+		<button id="showMatches">Fetch Matches</button>
+		<ul id="userMatches"></ul>
+	</div>
+	<div>
+		Generate Matches:
+		<button id="generateMatches">Generate Matches</button>
+		<ul id="generatedMatches"></ul>
+	</div>
+	<div>
+		Restart Matches:
+		<button id="restartMatches">Restart Matches</button>
+	</div>
+
 </body>
+
 </html>
