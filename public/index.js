@@ -98,11 +98,13 @@ function fetchCurrentMatches() {
 			var rightId = users[leftId].currentMatch;
 			if (rightId !== 'no match this round') {
 				var matchRight = users[rightId];
+				var disableConfirm = matchRight.matchConfirmed? 'disabled="true"' : '';
+				var disableUnConfirm = matchRight.matchConfirmed? '' : 'disabled="true"';
 				userIds = userIds.removeItem(rightId);
 				var names = matchLeft.primerNombre + ' - ' + matchRight.primerNombre;
-				var templateButton = '<button data-leftId="' + leftId + '" data-rigthId="' + rightId + '" class="showTemplate">Show Template</button>';
-				var confirmButton = ' <button id="confirm-' + leftId + rightId + '" data-leftId="' + leftId + '" data-rigthId="' + rightId + '" class="confirmMatch" disabled=' + disable +'>Confirm</button> ';
-				var unConfirmButton = ' <button id="unconfirm-' + leftId + rightId + '" data-leftId="' + leftId + '" data-rigthId="' + rightId + '" class="unConfirmMatch"' + disable +'>Unconfirm</button>';
+				var templateButton = '<button data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="showTemplate">Show Template</button>';
+				var confirmButton = ' <button id="confirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="confirmMatch" ' + disableConfirm +'>Confirm</button> ';
+				var unConfirmButton = ' <button id="unconfirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="unConfirmMatch" ' + disableUnConfirm +'>Unconfirm</button>';
 				matchesElement.append('<li>' + names + ' ' + templateButton + ' ' + confirmButton + ' ' + unConfirmButton + '</li>');
 			} else {
 				matchesElement.append('<li>' + matchLeft.primerNombre + ' - NO MATCH</li>');
@@ -119,8 +121,8 @@ function fetchCurrentMatches() {
 }
 
 function showTemplate() {
-	var leftId = $(element).data('leftId');
-	var rightId = $(element).data('rightId');
+	var leftId = $(element).data('left-id');
+	var rightId = $(element).data('right-id');
 	$('#mailTemplate').val(leftId + ' ' + rightId);
 }
 
@@ -131,6 +133,7 @@ function confirmMatch(confirmed, element) {
 	$('#unconfirm-' + leftId + rightId).prop('disabled', !confirmed);
 	userRef.child(leftId).child('matchConfirmed').set(confirmed);
 	userRef.child(rightId).child('matchConfirmed').set(confirmed);
+	fetchCurrentMatches();
 }
 
 function generateMatches() {

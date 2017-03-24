@@ -1,65 +1,9 @@
 [debug] ----------------------------------------------------------------------
-[debug] Command:      C:\Program Files\nodejs\node.exe C:\Users\Juan Herrera\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
-[debug] CLI Version:  3.2.3
-[debug] Platform:     win32
-[debug] Node Version: v6.7.0
-[debug] Time:         Mon Feb 13 2017 19:37:46 GMT-0500 (SA Pacific Standard Time)
-[debug] ----------------------------------------------------------------------
-[debug] 
-[info] Starting Firebase development server...
-[info] 
-[info] Project Directory: C:\Users\Juan Herrera\Repos\shared-lunch
-[info] Public Directory: public
-[info] 
-[info] Server listening at: http://localhost:5000
-[debug] ----------------------------------------------------------------------
-[debug] Command:      C:\Program Files\nodejs\node.exe C:\Users\Juan Herrera\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
-[debug] CLI Version:  3.2.3
-[debug] Platform:     win32
-[debug] Node Version: v6.7.0
-[debug] Time:         Tue Feb 14 2017 20:26:45 GMT-0500 (SA Pacific Standard Time)
-[debug] ----------------------------------------------------------------------
-[debug] 
-[info] Starting Firebase development server...
-[info] 
-[info] Project Directory: C:\Users\Juan Herrera\Repos\shared-lunch
-[info] Public Directory: public
-[info] 
-[info] Server listening at: http://localhost:5000
-[debug] ----------------------------------------------------------------------
-[debug] Command:      C:\Program Files\nodejs\node.exe C:\Users\Juan Herrera\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
-[debug] CLI Version:  3.2.3
-[debug] Platform:     win32
-[debug] Node Version: v6.7.0
-[debug] Time:         Tue Mar 21 2017 18:43:38 GMT-0500 (SA Pacific Standard Time)
-[debug] ----------------------------------------------------------------------
-[debug] 
-[info] Starting Firebase development server...
-[info] 
-[info] Project Directory: C:\Users\Juan Herrera\Repos\shared-lunch
-[info] Public Directory: public
-[info] 
-[info] Server listening at: http://localhost:5000
-[debug] ----------------------------------------------------------------------
 [debug] Command:      C:\Program Files\nodejs\node.exe C:\Users\juan.herrera\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
 [debug] CLI Version:  3.2.0
 [debug] Platform:     win32
 [debug] Node Version: v6.2.1
-[debug] Time:         Thu Mar 23 2017 07:01:48 GMT-0500 (SA Pacific Standard Time)
-[debug] ----------------------------------------------------------------------
-[debug] 
-[info] Starting Firebase development server...
-[info] 
-[info] Project Directory: C:\Users\juan.herrera\proyectos\others\shared-lunch
-[info] Public Directory: public
-[info] 
-[info] Server listening at: http://localhost:5000
-[debug] ----------------------------------------------------------------------
-[debug] Command:      C:\Program Files\nodejs\node.exe C:\Users\juan.herrera\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
-[debug] CLI Version:  3.2.0
-[debug] Platform:     win32
-[debug] Node Version: v6.2.1
-[debug] Time:         Thu Mar 23 2017 07:47:45 GMT-0500 (SA Pacific Standard Time)
+[debug] Time:         Fri Mar 24 2017 11:19:32 GMT-0500 (SA Pacific Standard Time)
 [debug] ----------------------------------------------------------------------
 [debug] 
 [info] Starting Firebase development server...
