@@ -21,11 +21,10 @@ function bootstrapFirebase() {
 }
 
 function bootstrapEvents() {
-	$('#addUser').click(clickAddUser);
-	$('#addMatch').click(clickAddMatch);
+	$('#addUser').click(addUser);
+	$('#addMatch').click(addMatch);
 	$('#fetchMatchesPerUser').click(fetchMatchesPerUser);
 	$('#generateMatches').click(generateMatches);
-	$('#fetchCurrentMatches').click(fetchCurrentMatches);
 }
 
 function fetchUsers() {
@@ -33,6 +32,7 @@ function fetchUsers() {
 		var options = $(".user-list");
 		options.children().remove();
 		fetchedUsers = snapshot.val();
+		users = {};
 		for (var userId in fetchedUsers) {
 			var currentUser = fetchedUsers[userId];
 			if (currentUser.active) {
@@ -44,15 +44,23 @@ function fetchUsers() {
 	});
 }
 
-function clickAddUser() {
+function addUser() {
 	var email = $('#email').val();
 	var primerNombre = $('#primerNombre').val();
 	var apellido = $('#apellido').val();
 	var lugarPreferido = $('#lugarPreferido').val();
-	addUser(email, primerNombre, apellido, lugarPreferido);
+	var newUserKey = userRef.push();
+	newUserKey.set({
+		email: email,
+		primerNombre: primerNombre,
+		apellido: apellido,
+		lugarPreferido: lugarPreferido,
+		active: true,
+		currentMatch: 'NO_MATCH_SET'
+	});
 }
 
-function clickAddMatch() {
+function addMatch() {
 	var matchLeft = $("#matchLeft").val();
 	var matchRight = $("#matchRight").val();
 	if (matchLeft !== matchRight) {
@@ -63,18 +71,6 @@ function clickAddMatch() {
 	} else {
 		alert('No puede seleccionar la misma persona');
 	}
-}
-
-function addUser(email, primerNombre, apellido, lugarPreferido) {
-	var newUserKey = userRef.push();
-	newUserKey.set({
-		email: email,
-		primerNombre: primerNombre,
-		apellido: apellido,
-		lugarPreferido: lugarPreferido,
-		active: true,
-		currentMatch: ''
-	});
 }
 
 function fetchMatchesPerUser() {
@@ -94,24 +90,31 @@ function fetchCurrentMatches() {
 	for (var leftId in users) {
 		if (userIds.indexOf(leftId) !== -1) {
 			var matchLeft = users[leftId];
+			//delete this
 			userIds = userIds.removeItem(leftId);
-			var rightId = users[leftId].currentMatch;
-			if (rightId !== 'no match this round') {
+			var rightId = matchLeft.currentMatch;
+			if (rightId !== 'NO_MATCH_SET') {
 				var matchRight = users[rightId];
-				var disableConfirm = matchRight.matchConfirmed? 'disabled="true"' : '';
-				var disableUnConfirm = matchRight.matchConfirmed? '' : 'disabled="true"';
+				var disableConfirm = '';
+				var disableUnConfirm = 'disabled="true"';
+				if (matchRight.matchConfirmed) {
+					disableConfirm = 'disabled="true"';
+					disableUnConfirm = '';
+				}
 				userIds = userIds.removeItem(rightId);
 				var names = matchLeft.primerNombre + ' - ' + matchRight.primerNombre;
 				var templateButton = '<button data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="showTemplate">Show Template</button>';
-				var confirmButton = ' <button id="confirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="confirmMatch" ' + disableConfirm +'>Confirm</button> ';
-				var unConfirmButton = ' <button id="unconfirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="unConfirmMatch" ' + disableUnConfirm +'>Unconfirm</button>';
+				var confirmButton = ' <button id="confirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="confirmMatch" ' + disableConfirm + '>Confirm</button> ';
+				var unConfirmButton = ' <button id="unconfirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="unConfirmMatch" ' + disableUnConfirm + '>Unconfirm</button>';
 				matchesElement.append('<li>' + names + ' ' + templateButton + ' ' + confirmButton + ' ' + unConfirmButton + '</li>');
 			} else {
 				matchesElement.append('<li>' + matchLeft.primerNombre + ' - NO MATCH</li>');
 			}
 		}
 	}
-	$('.showTemplate').click(showTemplate);
+	$('.showTemplate').click(function() {
+		showTemplate(this);
+	});
 	$('.confirmMatch').click(function () {
 		confirmMatch(true, this);
 	});
@@ -120,7 +123,7 @@ function fetchCurrentMatches() {
 	});
 }
 
-function showTemplate() {
+function showTemplate(element) {
 	var leftId = $(element).data('left-id');
 	var rightId = $(element).data('right-id');
 	$('#mailTemplate').val(leftId + ' ' + rightId);
@@ -137,28 +140,30 @@ function confirmMatch(confirmed, element) {
 }
 
 function generateMatches() {
+	restartMatches();
 	var generatedMatchesElement = $('#generatedMatches');
 	var usersForThisRound = getUsersForThisRound();
 	usersForThisRound = excludeOddUser(usersForThisRound);
-	var userIds = Object.keys(usersForThisRound);
-	for (var currentUserId in usersForThisRound) {
-		if (usersForThisRound[currentUserId].currentMatch) {
-			continue;
+	var remainingUsers = Object.keys(usersForThisRound);
+	for (var user in usersForThisRound) {
+		if (remainingUsers.length && remainingUsers.indexOf(user) !== -1) {
+			remainingUsers = remainingUsers.removeItem(user);
+			var selectedMatch = remainingUsers[getRandomNumber(remainingUsers.length)];
+			remainingUsers = remainingUsers.removeItem(selectedMatch);
+			usersForThisRound[user].currentMatch = selectedMatch;
+			userRef.child(user).child('currentMatch').set(selectedMatch);
+			usersForThisRound[selectedMatch].currentMatch = user;
+			userRef.child(selectedMatch).child('currentMatch').set(user);
 		}
-		userIds = userIds.removeItem(currentUserId);
-		var selectedUserId = userIds[getRandomNumber(userIds.length)];
-		userIds = userIds.removeItem(selectedUserId);
-		usersForThisRound[currentUserId].currentMatch = selectedUserId;
-		userRef.child(currentUserId).child('currentMatch').set(selectedUserId);
-		usersForThisRound[selectedUserId].currentMatch = currentUserId;
-		userRef.child(selectedUserId).child('currentMatch').set(currentUserId);
 	}
 	fetchCurrentMatches();
 }
 
 function restartMatches() {
 	for (userId in users) {
-		userRef.child(userId).child('currentMatch').set('');
+		if (!users[userId].matchConfirmed) {
+			userRef.child(userId).child('currentMatch').set('NO_MATCH_SET');
+		}
 	}
 }
 
@@ -166,7 +171,7 @@ function getUsersForThisRound() {
 	var usersForThisRound = {};
 	for (var userId in users) {
 		var currentUser = users[userId];
-		if (!currentUser.currentMatch && !currentUser.matchConfirmed) {
+		if (!currentUser.matchConfirmed) {
 			usersForThisRound[userId] = currentUser;
 		}
 	}
@@ -174,11 +179,10 @@ function getUsersForThisRound() {
 }
 
 function excludeOddUser(usersForThisRound) {
-	if (usersForThisRound.length % 2 !== 0) {
+	if (Object.keys(usersForThisRound).length % 2 !== 0) {
 		var userIds = Object.keys(usersForThisRound);
 		var excludedUserId = userIds[getRandomNumber(userIds.length)];
 		delete usersForThisRound[excludedUserId];
-		userRef.child(excludedUserId).child('currentMatch').set('no match this round');
 		return usersForThisRound;
 	}
 	return usersForThisRound;

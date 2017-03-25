@@ -12,3 +12,17 @@
 [info] Public Directory: public
 [info] 
 [info] Server listening at: http://localhost:5000
+[debug] ----------------------------------------------------------------------
+[debug] Command:      C:\Program Files\nodejs\node.exe C:\Users\Juan Herrera\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase serve
+[debug] CLI Version:  3.2.3
+[debug] Platform:     win32
+[debug] Node Version: v6.7.0
+[debug] Time:         Fri Mar 24 2017 20:13:14 GMT-0500 (SA Pacific Standard Time)
+[debug] ----------------------------------------------------------------------
+[debug] 
+[info] Starting Firebase development server...
+[info] 
+[info] Project Directory: C:\Users\Juan Herrera\Repos\shared-lunch
+[info] Public Directory: public
+[info] 
+[info] Server listening at: http://localhost:5000
