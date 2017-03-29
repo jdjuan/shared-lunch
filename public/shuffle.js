@@ -2,12 +2,17 @@ function fetchCurrentMatches() {
 	var matchesElement = $("#currentMatches");
 	matchesElement.children().remove();
 	var allUsers = getAllUsers();
+	remainingUsers = allUsers.slice();
 	allUsers.map(function (user) {
-		if (user.currentMatch !== 'NO_MATCH_SET') {
-			var match = findUserById(allUsers, user.currentMatch);
-			matchesElement.append(getMatchHTML(user, match));
-		} else {
-			matchesElement.append('<li>' + user.firstName + ' - NO MATCH</li>');
+		if (userListHasUser(remainingUsers, user)) {
+			remainingUsers = removeUserFromList(remainingUsers, user);
+			if (user.currentMatch !== 'NO_MATCH_SET') {
+				var match = findUserById(allUsers, user.currentMatch);
+				matchesElement.append(getMatchHTML(user, match));
+				remainingUsers = removeUserFromList(remainingUsers, match);
+			} else {
+				matchesElement.append('<li>' + user.firstName + ' - NO MATCH</li>');
+			}
 		}
 	});
 	addMatchesEvents();
