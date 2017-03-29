@@ -1,32 +1,19 @@
 function fetchCurrentMatches() {
 	var matchesElement = $("#currentMatches");
-	var userIds = Object.keys(usersStream);
 	matchesElement.children().remove();
-	for (var leftId in usersStream) {
-		if (userIds.indexOf(leftId) !== -1) {
-			var matchLeft = usersStream[leftId];
-			//delete this
-			userIds = userIds.removeItem(leftId);
-			var rightId = matchLeft.currentMatch;
-			if (rightId !== 'NO_MATCH_SET') {
-				var matchRight = usersStream[rightId];
-				var disableConfirm = '';
-				var disableUnConfirm = 'disabled="true"';
-				if (matchRight.matchConfirmed) {
-					disableConfirm = 'disabled="true"';
-					disableUnConfirm = '';
-				}
-				userIds = userIds.removeItem(rightId);
-				var names = matchLeft.firstName + ' - ' + matchRight.firstName;
-				var templateButton = '<button data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="showTemplate">Show Template</button>';
-				var confirmButton = ' <button id="confirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="confirmMatch" ' + disableConfirm + '>Confirm</button> ';
-				var unConfirmButton = ' <button id="unconfirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="unConfirmMatch" ' + disableUnConfirm + '>Unconfirm</button>';
-				matchesElement.append('<li>' + names + ' ' + templateButton + ' ' + confirmButton + ' ' + unConfirmButton + '</li>');
-			} else {
-				matchesElement.append('<li>' + matchLeft.firstName + ' - NO MATCH</li>');
-			}
+	var allUsers = getAllUsers();
+	allUsers.map(function (user) {
+		if (user.currentMatch !== 'NO_MATCH_SET') {
+			var match = findUserById(allUsers, user.currentMatch);
+			matchesElement.append(getMatchHTML(user, match));
+		} else {
+			matchesElement.append('<li>' + user.firstName + ' - NO MATCH</li>');
 		}
-	}
+	});
+	addMatchesEvents();
+}
+
+function addMatchesEvents() {
 	$('.showTemplate').click(function () {
 		showTemplate(this);
 	});
@@ -36,6 +23,20 @@ function fetchCurrentMatches() {
 	$('.unConfirmMatch').click(function () {
 		confirmMatch(false, this);
 	});
+}
+
+function getMatchHTML(matchLeft, matchRight) {
+	var disableConfirm = '';
+	var disableUnConfirm = 'disabled="true"';
+	if (matchRight.matchConfirmed) {
+		disableConfirm = 'disabled="true"';
+		disableUnConfirm = '';
+	}
+	var names = matchLeft.firstName + ' - ' + matchRight.firstName;
+	var templateButton = '<button data-left-id="' + matchLeft.id + '" data-right-id="' + matchRight.id + '" class="showTemplate">Show Template</button>';
+	var confirmButton = ' <button id="confirm-' + matchLeft.id + matchRight.id + '" data-left-id="' + matchLeft.id + '" data-right-id="' + matchRight.id + '" class="confirmMatch" ' + disableConfirm + '>Confirm</button> ';
+	var unConfirmButton = ' <button id="unconfirm-' + matchLeft.id + matchRight.id + '" data-left-id="' + matchLeft.id + '" data-right-id="' + matchRight.id + '" class="unConfirmMatch" ' + disableUnConfirm + '>Unconfirm</button>';
+	return '<li>' + names + ' ' + templateButton + ' ' + confirmButton + ' ' + unConfirmButton + '</li>';
 }
 
 function generateMatches() {
@@ -64,6 +65,12 @@ function selectMatches() {
 			userRef.child(user.id).child('currentMatch').set(selectedMatch.id);
 			userRef.child(selectedMatch.id).child('currentMatch').set(user.id);
 		}
+	});
+}
+
+function findUserById(users, id) {
+	return users.find(function (user) {
+		return user.id === id;
 	});
 }
 
@@ -120,8 +127,14 @@ function filterUsersByLocation(users, location) {
 }
 
 function getUsersForThisRound() {
-	var usersForThisRound = filterOddUser(getActiveUsers());
+	var usersForThisRound = filterConfirmedMatches(filterOddUser(getActiveUsers()));
 	return usersForThisRound;
+}
+
+function filterConfirmedMatches(users) {
+	return users.filter(function (user) {
+		return !user.matchConfirmed;
+	});
 }
 
 function filterOddUser(users) {
