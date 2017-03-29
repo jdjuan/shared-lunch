@@ -25,20 +25,30 @@ function bootstrapEvents() {
 	$('#addMatch').click(addMatch);
 	$('#fetchMatchesPerUser').click(fetchMatchesPerUser);
 	$('#generateMatches').click(generateMatches);
+	$('#restartMatches').click(restartMatches);
+	$('#activateUser').click(activateUser);
+	$('#inactivateUser').click(inactivateUser);
 }
 
 function fetchUsers() {
 	userRef.on('value', function (snapshot) {
 		var options = $(".user-list");
+		var optionsActive = $("#usersToActivate");
+		var optionsInactive = $("#usersToInactivate");
 		options.children().remove();
+		optionsActive.children().remove();
+		optionsInactive.children().remove();
 		fetchedUsers = snapshot.val();
 		usersStream = {};
 		for (var userId in fetchedUsers) {
 			var currentUser = fetchedUsers[userId];
 			if (currentUser.active) {
+				optionsInactive.append($("<option />").val(userId).text(currentUser.lastName + ' ' + currentUser.firstName));
 				usersStream[userId] = currentUser;
+			} else {
+				optionsActive.append($("<option />").val(userId).text(currentUser.lastName + ' ' + currentUser.firstName));
 			}
-			options.append($("<option />").val(userId).text(currentUser.firstName));
+			options.append($("<option />").val(userId).text(currentUser.lastName + ' ' + currentUser.firstName));
 		}
 		fetchCurrentMatches();
 	});
@@ -99,9 +109,28 @@ function confirmMatch(confirmed, element) {
 }
 
 function showTemplate(element) {
-	var leftId = $(element).data('left-id');
-	var rightId = $(element).data('right-id');
-	$('#mailTemplate').val(leftId + ' ' + rightId);
+	var leftUser = getUserById($(element).data('left-id'));
+	var rightUser = getUserById($(element).data('right-id'));
+	$('#mailTemplate').val('¡Almuerzo Compartido!\n\n'+
+	'Hola ' + leftUser.firstName + ' y ' + rightUser.firstName + ',\n\n' +
+	'¡Ustedes tendrán un almuerzo compartido!. Esta iniciativa busca romper la rutina al conectarte con alguien aleatoriamente. Pregúntale sobre su vida, sus pasiones y sus metas. Pueden hablar de la música que les gusta y compartir sus canciones favoritas. Mercado del Río es una excelente opción, Mr. Sanchez también, o pueden traer su propio almuerzo y disfrutrarlo en la terraza. Toma la iniciativa y saluda primero:\n\n' +
+		leftUser.email + ' \n' +
+		rightUser.email + '\n\n' +
+		'A partir de este momento quedan en contacto para ir a almorzar juntos.\n\n' +
+		'PD: Recuerda que si llegaste a Yuxi en el último mes, tú y tu pareja tendrán un almuerzo gratuito!. Si aplicas déjanoslo saber para explicarte las condiciones.\n\n' +
+		'¡Un saludo!\n' +
+		'Juan Herrera\n' +
+		'Con el Apoyo de Yuxi Global\n');
+}
+
+function activateUser() {
+	var userId = $('#usersToActivate').val();
+	userRef.child(userId).child('active').set(true);
+}
+
+function inactivateUser() {
+	var userId = $('#usersToInactivate').val();
+	userRef.child(userId).child('active').set(false);
 }
 
 Array.prototype.clone = function () {

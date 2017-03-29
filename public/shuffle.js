@@ -1,7 +1,7 @@
 function fetchCurrentMatches() {
 	var matchesElement = $("#currentMatches");
 	matchesElement.children().remove();
-	var allUsers = getAllUsers();
+	var allUsers = getActiveUsers();
 	remainingUsers = allUsers.slice();
 	allUsers.map(function (user) {
 		if (userListHasUser(remainingUsers, user)) {
@@ -11,7 +11,14 @@ function fetchCurrentMatches() {
 				matchesElement.append(getMatchHTML(user, match));
 				remainingUsers = removeUserFromList(remainingUsers, match);
 			} else {
-				matchesElement.append('<li>' + user.firstName + ' - NO MATCH</li>');
+				var matches = '';
+				// if (user.matches) {
+				// 	matches = getNamesFromMatches(jsObjectToArray(user.matches));
+				// }
+				// matchesElement.append('<li>' + user.firstName + ' ' + user.lastName + ' | ' + user.active + ' </li>');
+				// matchesElement.append('<li>' + user.firstName + ' ' + user.lastName + ' | ' + matches + ' </li>');
+				// matchesElement.append('<li>' + user.firstName + ' | ' + user.lastName + ' | ' + user.email + ' | '+ user.location);
+				matchesElement.append('<li>' + user.firstName + ' | NO MATCH</li>');
 			}
 		}
 	});
@@ -37,7 +44,7 @@ function getMatchHTML(matchLeft, matchRight) {
 		disableConfirm = 'disabled="true"';
 		disableUnConfirm = '';
 	}
-	var names = matchLeft.firstName + ' - ' + matchRight.firstName;
+	var names = matchLeft.firstName + ' ' + matchLeft.lastName + ' - ' + matchRight.firstName + ' ' + matchRight.lastName;
 	var templateButton = '<button data-left-id="' + matchLeft.id + '" data-right-id="' + matchRight.id + '" class="showTemplate">Show Template</button>';
 	var confirmButton = ' <button id="confirm-' + matchLeft.id + matchRight.id + '" data-left-id="' + matchLeft.id + '" data-right-id="' + matchRight.id + '" class="confirmMatch" ' + disableConfirm + '>Confirm</button> ';
 	var unConfirmButton = ' <button id="unconfirm-' + matchLeft.id + matchRight.id + '" data-left-id="' + matchLeft.id + '" data-right-id="' + matchRight.id + '" class="unConfirmMatch" ' + disableUnConfirm + '>Unconfirm</button>';
@@ -71,6 +78,22 @@ function selectMatches() {
 			userRef.child(selectedMatch.id).child('currentMatch').set(user.id);
 		}
 	});
+}
+
+function getNamesFromMatches(matches) {
+	return getActiveUsers().reduce(function (total, user) {
+		var accumulator = '';
+		matches.map(function (match) {
+			if (user.id === match.id) {
+				accumulator = user.firstName + ' | ';
+			}
+		});
+		return total + accumulator;
+	}, '');
+}
+
+function getUserById(userId) {
+	return findUserById(getAllUsers(), userId);
 }
 
 function findUserById(users, id) {
