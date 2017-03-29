@@ -5,7 +5,7 @@ $(function () {
 });
 
 var userRef;
-var users = {};
+var usersStream = {};
 
 function bootstrapFirebase() {
 	var config = {
@@ -32,13 +32,13 @@ function fetchUsers() {
 		var options = $(".user-list");
 		options.children().remove();
 		fetchedUsers = snapshot.val();
-		users = {};
+		usersStream = {};
 		for (var userId in fetchedUsers) {
 			var currentUser = fetchedUsers[userId];
 			if (currentUser.active) {
-				users[userId] = currentUser;
+				usersStream[userId] = currentUser;
 			}
-			options.append($("<option />").val(userId).text(currentUser.primerNombre));
+			options.append($("<option />").val(userId).text(currentUser.firstName));
 		}
 		fetchCurrentMatches();
 	});
@@ -46,15 +46,16 @@ function fetchUsers() {
 
 function addUser() {
 	var email = $('#email').val();
-	var primerNombre = $('#primerNombre').val();
-	var apellido = $('#apellido').val();
-	var lugarPreferido = $('#lugarPreferido').val();
+	var firstName = $('#firstName').val();
+	var lastName = $('#lastName').val();
+	var location = parseInt($('#location').val());
 	var newUserKey = userRef.push();
 	newUserKey.set({
 		email: email,
-		primerNombre: primerNombre,
-		apellido: apellido,
-		lugarPreferido: lugarPreferido,
+		firstName: firstName,
+		lastName: lastName,
+		//location => 0: Adentro, 1: Afuera, 2: Cualquiera
+		location: location,
 		active: true,
 		currentMatch: 'NO_MATCH_SET'
 	});
@@ -68,6 +69,10 @@ function addMatch() {
 		matchRef.transaction(function (matches) {
 			return matches ? matches + 1 : 1;
 		});
+		matchRef = userRef.child(matchRight).child('matches').child(matchLeft);
+		matchRef.transaction(function (matches) {
+			return matches ? matches + 1 : 1;
+		});
 	} else {
 		alert('No puede seleccionar la misma persona');
 	}
@@ -77,56 +82,10 @@ function fetchMatchesPerUser() {
 	var userId = $('#userToFetchMatchesFrom').val();
 	var matchesElement = $("#userMatches");
 	matchesElement.children().remove();
-	var matches = users[userId].matches;
+	var matches = usersStream[userId].matches;
 	for (var match in matches) {
-		matchesElement.append('<li>' + users[match].primerNombre + '</li>');
+		matchesElement.append('<li>' + usersStream[match].firstName + '</li>');
 	}
-}
-
-function fetchCurrentMatches() {
-	var matchesElement = $("#currentMatches");
-	var userIds = Object.keys(users);
-	matchesElement.children().remove();
-	for (var leftId in users) {
-		if (userIds.indexOf(leftId) !== -1) {
-			var matchLeft = users[leftId];
-			//delete this
-			userIds = userIds.removeItem(leftId);
-			var rightId = matchLeft.currentMatch;
-			if (rightId !== 'NO_MATCH_SET') {
-				var matchRight = users[rightId];
-				var disableConfirm = '';
-				var disableUnConfirm = 'disabled="true"';
-				if (matchRight.matchConfirmed) {
-					disableConfirm = 'disabled="true"';
-					disableUnConfirm = '';
-				}
-				userIds = userIds.removeItem(rightId);
-				var names = matchLeft.primerNombre + ' - ' + matchRight.primerNombre;
-				var templateButton = '<button data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="showTemplate">Show Template</button>';
-				var confirmButton = ' <button id="confirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="confirmMatch" ' + disableConfirm + '>Confirm</button> ';
-				var unConfirmButton = ' <button id="unconfirm-' + leftId + rightId + '" data-left-id="' + leftId + '" data-right-id="' + rightId + '" class="unConfirmMatch" ' + disableUnConfirm + '>Unconfirm</button>';
-				matchesElement.append('<li>' + names + ' ' + templateButton + ' ' + confirmButton + ' ' + unConfirmButton + '</li>');
-			} else {
-				matchesElement.append('<li>' + matchLeft.primerNombre + ' - NO MATCH</li>');
-			}
-		}
-	}
-	$('.showTemplate').click(function() {
-		showTemplate(this);
-	});
-	$('.confirmMatch').click(function () {
-		confirmMatch(true, this);
-	});
-	$('.unConfirmMatch').click(function () {
-		confirmMatch(false, this);
-	});
-}
-
-function showTemplate(element) {
-	var leftId = $(element).data('left-id');
-	var rightId = $(element).data('right-id');
-	$('#mailTemplate').val(leftId + ' ' + rightId);
 }
 
 function confirmMatch(confirmed, element) {
@@ -139,57 +98,10 @@ function confirmMatch(confirmed, element) {
 	fetchCurrentMatches();
 }
 
-function generateMatches() {
-	restartMatches();
-	var generatedMatchesElement = $('#generatedMatches');
-	var usersForThisRound = getUsersForThisRound();
-	usersForThisRound = excludeOddUser(usersForThisRound);
-	var remainingUsers = Object.keys(usersForThisRound);
-	for (var user in usersForThisRound) {
-		if (remainingUsers.length && remainingUsers.indexOf(user) !== -1) {
-			remainingUsers = remainingUsers.removeItem(user);
-			var selectedMatch = remainingUsers[getRandomNumber(remainingUsers.length)];
-			remainingUsers = remainingUsers.removeItem(selectedMatch);
-			usersForThisRound[user].currentMatch = selectedMatch;
-			userRef.child(user).child('currentMatch').set(selectedMatch);
-			usersForThisRound[selectedMatch].currentMatch = user;
-			userRef.child(selectedMatch).child('currentMatch').set(user);
-		}
-	}
-	fetchCurrentMatches();
-}
-
-function restartMatches() {
-	for (userId in users) {
-		if (!users[userId].matchConfirmed) {
-			userRef.child(userId).child('currentMatch').set('NO_MATCH_SET');
-		}
-	}
-}
-
-function getUsersForThisRound() {
-	var usersForThisRound = {};
-	for (var userId in users) {
-		var currentUser = users[userId];
-		if (!currentUser.matchConfirmed) {
-			usersForThisRound[userId] = currentUser;
-		}
-	}
-	return usersForThisRound;
-}
-
-function excludeOddUser(usersForThisRound) {
-	if (Object.keys(usersForThisRound).length % 2 !== 0) {
-		var userIds = Object.keys(usersForThisRound);
-		var excludedUserId = userIds[getRandomNumber(userIds.length)];
-		delete usersForThisRound[excludedUserId];
-		return usersForThisRound;
-	}
-	return usersForThisRound;
-}
-
-function getRandomNumber(limit) {
-	return parseInt(Math.random() * limit);
+function showTemplate(element) {
+	var leftId = $(element).data('left-id');
+	var rightId = $(element).data('right-id');
+	$('#mailTemplate').val(leftId + ' ' + rightId);
 }
 
 Array.prototype.clone = function () {

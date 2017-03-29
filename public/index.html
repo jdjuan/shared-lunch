@@ -7,6 +7,7 @@
 	<script src="https://www.gstatic.com/firebasejs/3.6.9/firebase.js"></script>
 	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc="
 	    crossorigin="anonymous"></script>
+	<script src="shuffle.js"></script>
 	<script src="index.js"></script>
 
 </head>
@@ -14,9 +15,9 @@
 <body>
 	<div>
 		<input id="email" value="juan@test.com" type="text" placeholder="email"></br>
-		<input id="primerNombre" value="Juan" type="text" placeholder="Primer Nombre"></br>
-		<input id="apellido" value="Herrera" type="text" placeholder="apellido"></br>
-		<input id="lugarPreferido" value="1" type="number" min="0" max="2"></br>
+		<input id="firstName" value="Juan" type="text" placeholder="Juan"></br>
+		<input id="lastName" value="Herrera" type="text" placeholder="Herrera"></br>
+		<input id="location" value="1" type="number" min="0" max="2"></br>
 		<button id="addUser">Add User</button>
 	</div>
 	<div>
@@ -38,7 +39,10 @@
 		At w3schools.com you will learn how to make a website. We offer free tutorials in all web development technologies. 
 		</textarea>
 	</div>
-
+	<div>
+		<button id="closeRound">Close this round</button>
+		This will move currentMatch into Matches array
+	</div>
 </body>
 
 </html>
