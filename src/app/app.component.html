@@ -1,0 +1,10 @@
+<div *ngIf="test | async ">
+  {{ test | async | json }}
+  {{ (test | async)?.name }}
+</div>
+
+<ul>
+  <li class="text" *ngFor="let item of items | async">
+    {{item | json}}
+  </li>
+</ul>
