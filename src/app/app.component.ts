@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
 
   settleCurrentMatches() {
     this.activeUsers.forEach((user: User) => {
+
       if (user.currentMatch !== 'NO_MATCH_SET') {
         const currentMatch = user.currentMatch;
         // user.matches.
@@ -40,7 +41,30 @@ export class AppComponent implements OnInit {
         // }
         const match = {};
         match[currentMatch] = 1;
-        this.db.object('/users/' + user.$key + '/matches').update(match);
+
+        this. db.database.ref('/users/' + user.$key + '/matches/'+user.currentMatch)
+        .transaction((oldPin) => {
+          console.log("Primer paso");
+              // Check if the result is NOT NULL:
+              if (oldPin) {
+                  const myvar = oldPin+1;
+                  console.log(myvar)
+                  return myvar;
+                  
+              } else {
+                  // Return a value that is totally different 
+                  // from what is saved on the server at this address:
+                  return 1;
+              }
+          }, function(error, committed, snapshot) {
+              if (error) {
+                  console.log("error in transaction");
+              } else if (!committed) {
+                  console.log("transaction not committed");
+              } else {
+                  console.log("Transaction Committed");
+              }
+          }, true);
         this.db.object('/users/' + user.$key).update({ 'currentMatch': 'NO_MATCH_SET' });
       }
     });
@@ -50,8 +74,7 @@ export class AppComponent implements OnInit {
     this.db.list('/users', {
       query: {
         orderByChild: 'active',
-        equalTo: true,
-        limitToFirst: 1
+        equalTo: true
       }
     }).subscribe((users: User[]) => {
       this.activeUsers = User.createUsers(users);
