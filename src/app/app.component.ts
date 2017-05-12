@@ -2,6 +2,7 @@ import { User } from './shared/user';
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2/database';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/do';
 
 @Component({
   selector: 'app-root',
@@ -10,32 +11,51 @@ import 'rxjs/add/operator/map';
 })
 export class AppComponent implements OnInit {
 
-  private _activeUsers: FirebaseListObservable<any[]>;
+  private activeUsers: User[];
 
-  constructor(private db: AngularFireDatabase) { }
-
-  ngOnInit() {
-    this.activeUsers.map((users: User[]) => User.createUsers(users))
-      .subscribe((users: User[]) => {
-        users.forEach((user: User) => {
-          if (user.isNewUser()) {
-            console.log(user);
-            console.log(user.getMatch(users));
-          }
-        });
-      });
+  constructor(private db: AngularFireDatabase) {
+    this.fetchActiveUsers();
   }
 
-  get activeUsers(): FirebaseListObservable<any[]> {
-    if (!this._activeUsers) {
-      this._activeUsers = this.db.list('/users', {
-        query: {
-          orderByChild: 'active',
-          equalTo: true,
-        }
-      });
-    }
-    return this._activeUsers;
+  ngOnInit() {
+    // this.settleCurrentMatches();
+  }
+
+  generateMatchesForNewbies() {
+    this.activeUsers.forEach((user: User) => {
+      if (user.isNewUser()) {
+        console.log(user);
+        console.log(user.getMatch(this.activeUsers));
+      }
+    });
+  }
+
+  settleCurrentMatches() {
+    this.activeUsers.forEach((user: User) => {
+      if (user.currentMatch !== 'NO_MATCH_SET') {
+        const currentMatch = user.currentMatch;
+        // user.matches.
+        // if() {
+        // db.database.ref('').transaction
+        // }
+        const match = {};
+        match[currentMatch] = 1;
+        this.db.object('/users/' + user.$key + '/matches').update(match);
+        this.db.object('/users/' + user.$key).update({ 'currentMatch': 'NO_MATCH_SET' });
+      }
+    });
+  }
+
+  fetchActiveUsers() {
+    this.db.list('/users', {
+      query: {
+        orderByChild: 'active',
+        equalTo: true,
+        limitToFirst: 1
+      }
+    }).subscribe((users: User[]) => {
+      this.activeUsers = User.createUsers(users);
+    });
   }
 }
 

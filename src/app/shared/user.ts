@@ -51,7 +51,7 @@ export class User {
         const availableUsers: User[] = [];
         const filteredUsers: User[] = this.filterUsersByLocation(users, this.location);
         filteredUsers.forEach((user: User) => {
-            if (this.$key !== user.$key && !user.hasCurrentMatch) {
+            if (this.$key !== user.$key && !user.hasCurrentMatch()) {
                 availableUsers.push(user);
             }
         });
