@@ -1,2 +1,9 @@
 <button (click)="generateMatchesForNewbies()">Generate Matches for newbies</button>
 <button (click)="settleCurrentMatches()">Settle current matches</button>
+<div *ngIf="activeUsers">
+    entra
+    {{activeUsers.length}}
+    <div *ngFor="let user of activeUsers">
+        {{user.firstName | json}}
+    </div>
+</div>

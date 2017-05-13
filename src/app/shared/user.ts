@@ -1,20 +1,22 @@
 export class User {
 
     static createUsers(users: User[]): User[] {
-        return users.map((user: User) => {
-            return new User(
-                user.$key,
-                user.$exists,
-                user.active,
-                user.currentMatch,
-                user.email,
-                user.firstName,
-                user.lastName,
-                user.location,
-                user.matchConfirmed,
-                user.matches
-            );
-        });
+        return users.map((user: User) => User.createUser(user));
+    }
+
+    static createUser(user: User): User {
+        return new User(
+            user.$key,
+            user.$exists,
+            user.active,
+            user.currentMatch,
+            user.email,
+            user.firstName,
+            user.lastName,
+            user.location,
+            user.matchConfirmed,
+            user.matches
+        );
     }
 
     constructor(
@@ -44,7 +46,7 @@ export class User {
 
     getMatch(users: User[]) {
         const selectedUser = this.selectRandomMatch(this.getPossibleMatches(users));
-        return selectedUser ? selectedUser : 'NO_MATCH_FOUND' ;
+        return selectedUser ? selectedUser : 'NO_MATCH_FOUND';
     }
 
     getPossibleMatches(users: User[]): User[] {
