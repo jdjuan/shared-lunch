@@ -1,3 +1,6 @@
+import { CoreModule } from './core/core.module';
+import { CrudModule } from './crud/crud.module';
+import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -7,14 +10,6 @@ import { AppComponent } from './app.component';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyBqKAZkqej4_iVBTmPof7_3CwivOpskQW8',
-  authDomain: 'shared-lunch.firebaseapp.com',
-  databaseURL: 'https://shared-lunch.firebaseio.com',
-  storageBucket: 'shared-lunch.appspot.com',
-  messagingSenderId: '44211415855'
-};
-
 @NgModule({
   declarations: [
     AppComponent
@@ -23,8 +18,9 @@ const firebaseConfig = {
     BrowserModule,
     FormsModule,
     HttpModule,
-    AngularFireModule.initializeApp(firebaseConfig, 'my-app-name'),
-    AngularFireDatabaseModule
+    CoreModule,
+    CrudModule,
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
