@@ -1,4 +1,4 @@
-<div *ngIf="userService.filteredUsers">
+<div *ngIf="userService.users">
   <!--BUTTONS-->
   <div>
     Generate:
@@ -20,7 +20,6 @@
   <!--TABLE-->
   <div class="col-md-12">
     <div class="text-right">
-      {{userService.filteredUsers.length}} rows returned
     </div>
     <div class="table-responsive">
       <table class="table table-striped table-hover table-condensed table-responsive">
@@ -36,26 +35,41 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let user of userService.filteredUsers; let i=index">
-            <td>{{i}}</td>
-            <td class="info">{{userService.getUserFullName(user.$key)}}</td>
-            <td>{{user.$key}}</td>
-            <td>{{user.location}}</td>
-            <td [class.success]="user.matchConfirmed" [class.danger]="!user.matchConfirmed">
-              {{userService.getUserFullName(user.currentMatch)}}
-            </td>
-            <td>
-              <app-dropdown *ngIf="user.matches" [matches]="user.matches"></app-dropdown>
-            </td>
-            <td class="text-right">
-              <button [disabled]="!user.active" [class.btn-primary]="user.active" class="btn" (click)="userService.matchUser(user)">Match</button>
-              <button [disabled]="!user.active" [class.btn-danger]="user.active" class="btn" (click)="userService.unmatchUser(user)">Unmatch</button>
-              <button [disabled]="!user.active" [class.btn-success]="user.active" class="btn" (click)="userService.confirmMatch(user)">Confirm</button>
-              <button [disabled]="!user.active" [class.btn-warning]="user.active" class="btn" (click)="userService.settleMatch(user)">Settle</button>
-            </td>
+          <tr *ngFor="let user of userService.users; let i=index">
+            <ng-container *ngIf="userService.isIn(user)">
+              <td>{{i}}</td>
+              <td class="info">{{userService.getUserFullName(user.$key)}}</td>
+              <td>{{user.$key}}</td>
+              <td>{{user.location}}</td>
+              <td [class.success]="user.matchConfirmed" [class.danger]="!user.matchConfirmed">
+                {{userService.getUserFullName(user.currentMatch)}}
+              </td>
+              <td>
+                <app-dropdown *ngIf="user.matches" [matches]="user.matches"></app-dropdown>
+              </td>
+              <td class="text-right">
+                <button [disabled]="!user.active || user.currentMatch || user.matchConfirmed" [class.btn-primary]="user.active" class="btn" (click)="userService.matchUser(user)">Match</button>
+                <button [disabled]="!user.active || !user.currentMatch || user.matchConfirmed" [class.btn-danger]="user.active" class="btn"
+                  (click)="userService.unmatchUser(user)">Unmatch</button>
+                <button [disabled]="!user.active || !user.currentMatch || user.matchConfirmed" [class.btn-success]="user.active" class="btn"
+                  (click)="userService.confirmMatch(user)">Confirm</button>
+                <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-danger]="user.active" class="btn" (click)="userService.unconfirmMatch(user)">Unconfirm</button>
+                <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-warning]="user.active" class="btn" (click)="userService.settleMatch(user)">Settle</button>
+              </td>
+            </ng-container>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+
+<li>
+  {{userService.filter | json}}
+</li>
+<br>
+
+<br>
+<li *ngFor="let user of userService.users">
+  {{user | json}}
+</li>

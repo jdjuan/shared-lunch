@@ -8,18 +8,14 @@ import { Observable } from 'rxjs/Observable';
 export class UserService {
 
     users: User[];
-    filteredUsers: User[];
-    private cachedUsers: { [id: string]: User } = {};
+    filter: string[];
+    cachedUsers: { [id: string]: User } = {};
 
     constructor(private db: AngularFireDatabase) {
         this.fetchUsers().subscribe((users: User[]) => {
             this.users = users;
-            if (!this.filteredUsers) {
-                this.filteredUsers = users;
-            } else {
-                this.filteredUsers = this.filteredUsers.map((user: User) => {
-                    return this.cachedUsers[user.$key];
-                });
+            if (!this.filter) {
+                this.showAll();
             }
         });
     }
@@ -32,47 +28,73 @@ export class UserService {
         }));
     }
 
+    isIn(user: User): boolean {
+        return this.filter.includes(user.$key);
+    }
+
     showAll() {
-        this.filteredUsers = this.users;
+        this.filter = Object.keys(this.cachedUsers);
     }
 
     filterUsersThatHaveMatched(haveMatched: boolean) {
-        this.filteredUsers = this.users
-            .filter((user: User) => haveMatched ? user.hasMatched() : !user.hasMatched());
+        this.filter = [];
+        this.users.forEach((user: User) => {
+            const filterUser = haveMatched ? user.hasMatched() : !user.hasMatched();
+            if (filterUser) {
+                this.filter.push(user.$key);
+            }
+        });
     }
 
     filterUsersWithCurrentMatch(withCurrentMatch: boolean) {
-        this.filteredUsers = this.users
-            .filter((user: User) => withCurrentMatch ? user.currentMatch : !user.currentMatch);
+        this.filter = [];
+        this.users.forEach((user: User) => {
+            const filterUser = withCurrentMatch ? user.currentMatch : !user.currentMatch;
+            if (filterUser) {
+                this.filter.push(user.$key);
+            }
+        });
     }
 
     filterConfirmed(confirmed) {
-        this.filteredUsers = this.users
-            .filter((user: User) => confirmed ? user.matchConfirmed : !user.matchConfirmed);
+        this.filter = [];
+        this.users.forEach((user: User) => {
+            const filterUser = confirmed ? user.matchConfirmed : !user.matchConfirmed;
+            if (filterUser) {
+                this.filter.push(user.$key);
+            }
+        });
     }
 
     filterInactiveUsers() {
-        this.filteredUsers = this.users.filter((user: User) => !user.isActive());
+        this.filter = [];
+        this.users.forEach((user: User) => {
+            if (!user.isActive()) {
+                this.filter.push(user.$key);
+            }
+        });
     }
 
     matchAllUsers() {
         this.users.forEach((user: User) => this.matchUser(user));
     }
 
-    matchUser(user: User) {
-        if (user.currentMatch) {
-            const oldMatch: User = this.getUserById(user.currentMatch);
-            user.currentMatch = null;
-            user.match(this.users);
-            oldMatch.currentMatch = null;
-        } else {
-            user.match(this.users);
+    matchUser(userLeft: User) {
+        if (!userLeft.currentMatch) {
+            const userRight: User = userLeft.match(this.users);
+            if (userRight) {
+                this.db.object('/users/' + userLeft.$key).update({ 'currentMatch': userRight.$key });
+                this.db.object('/users/' + userRight.$key).update({ 'currentMatch': userLeft.$key });
+            }
         }
     }
 
-    unmatchUser(user: User) {
-        this.getUserById(user.currentMatch).currentMatch = null;
-        user.currentMatch = null;
+    unmatchUser(userLeft: User) {
+        if (userLeft.currentMatch) {
+            const userRight: User = this.getUserById(userLeft.currentMatch);
+            this.db.object('/users/' + userLeft.$key).update({ 'currentMatch': '' });
+            this.db.object('/users/' + userRight.$key).update({ 'currentMatch': '' });
+        }
     }
 
     confirmAllMatches() {
@@ -80,10 +102,18 @@ export class UserService {
     }
 
     confirmMatch(userLeft: User) {
-        if (userLeft.currentMatch) {
-            const userRight = this.getUserById(userLeft.currentMatch);
-            this.db.object('/users/' + userLeft.$key).update({ 'matchConfirmed': true, 'currentMatch': userRight.$key });
-            this.db.object('/users/' + userRight.$key).update({ 'matchConfirmed': true, 'currentMatch': userLeft.$key });
+        if (userLeft.currentMatch && !userLeft.matchConfirmed) {
+            const userRight: User = this.getUserById(userLeft.currentMatch);
+            this.db.object('/users/' + userLeft.$key).update({ 'matchConfirmed': true });
+            this.db.object('/users/' + userRight.$key).update({ 'matchConfirmed': true });
+        }
+    }
+
+    unconfirmMatch(userLeft: User) {
+        if (userLeft.currentMatch && userLeft.matchConfirmed) {
+            const userRight: User = this.getUserById(userLeft.currentMatch);
+            this.db.object('/users/' + userLeft.$key).update({ 'matchConfirmed': false });
+            this.db.object('/users/' + userRight.$key).update({ 'matchConfirmed': false });
         }
     }
 
@@ -93,7 +123,7 @@ export class UserService {
 
     settleMatch(userLeft: User) {
         if (userLeft.currentMatch && userLeft.matchConfirmed) {
-            const userRight = this.getUserById(userLeft.currentMatch);
+            const userRight: User = this.getUserById(userLeft.currentMatch);
             if (userRight.currentMatch && userRight.matchConfirmed) {
                 this.db.database
                     .ref('/users/' + userLeft.$key + '/matches/' + userRight.$key)

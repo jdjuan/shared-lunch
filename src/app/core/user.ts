@@ -47,13 +47,15 @@ export class User {
 
     match(users: User[]) {
         if (this.active) {
-            const matches = this.getPossibleMatches(users);
+            const matches: User[] = this.getPossibleMatches(users);
             if (matches.length) {
                 const userRight: User = this.selectRandomMatch(matches);
                 userRight.currentMatch = this.$key;
                 this.currentMatch = userRight.$key;
+                return userRight;
             } else {
                 alert('No one available for ' + this.getFullName());
+                return null;
             }
         }
     }
