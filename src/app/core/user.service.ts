@@ -10,12 +10,13 @@ export class UserService {
     users: User[];
     filter: string[];
     cachedUsers: { [id: string]: User } = {};
+    columns = ['#', 'Name', 'ID', 'Location', 'Match', 'Matches', 'Options'];
 
     constructor(private db: AngularFireDatabase) {
         this.fetchUsers().subscribe((users: User[]) => {
             this.users = users;
             if (!this.filter) {
-                this.showAll();
+                this.filter = Object.keys(this.cachedUsers);
             }
         });
     }
@@ -30,49 +31,6 @@ export class UserService {
 
     isIn(user: User): boolean {
         return this.filter.includes(user.$key);
-    }
-
-    showAll() {
-        this.filter = Object.keys(this.cachedUsers);
-    }
-
-    filterUsersThatHaveMatched(haveMatched: boolean) {
-        this.filter = [];
-        this.users.forEach((user: User) => {
-            const filterUser = haveMatched ? user.hasMatched() : !user.hasMatched();
-            if (filterUser) {
-                this.filter.push(user.$key);
-            }
-        });
-    }
-
-    filterUsersWithCurrentMatch(withCurrentMatch: boolean) {
-        this.filter = [];
-        this.users.forEach((user: User) => {
-            const filterUser = withCurrentMatch ? user.currentMatch : !user.currentMatch;
-            if (filterUser) {
-                this.filter.push(user.$key);
-            }
-        });
-    }
-
-    filterConfirmed(confirmed) {
-        this.filter = [];
-        this.users.forEach((user: User) => {
-            const filterUser = confirmed ? user.matchConfirmed : !user.matchConfirmed;
-            if (filterUser) {
-                this.filter.push(user.$key);
-            }
-        });
-    }
-
-    filterInactiveUsers() {
-        this.filter = [];
-        this.users.forEach((user: User) => {
-            if (!user.isActive()) {
-                this.filter.push(user.$key);
-            }
-        });
     }
 
     matchAllUsers() {

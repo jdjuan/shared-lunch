@@ -77,7 +77,7 @@ export class User {
 
     filterRepeatedMatches(users: User[]): User[] {
         const availableUsers: User[] = users
-            .filter((user: User) => this.isUserInMatches(user.$key));
+            .filter((user: User) => !this.isUserInMatches(user.$key));
         return availableUsers.length ? availableUsers : users;
     }
 
