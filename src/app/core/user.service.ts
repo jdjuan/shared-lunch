@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/Observable';
 @Injectable()
 export class UserService {
 
+    template: string;
     users: User[];
     filter: string[];
     cachedUsers: { [id: string]: User } = {};
@@ -27,6 +28,28 @@ export class UserService {
             this.cachedUsers[user.$key] = userInstance;
             return userInstance;
         }));
+    }
+
+    generateTemplate(leftUser: User) {
+        const rightUser: User = this.getUserById(leftUser.currentMatch);
+        this.template = `
+Hola ${leftUser.firstName} y ${rightUser.firstName},
+
+¡Ustedes tendrán un almuerzo compartido! Woohoo!
+
+En Almuerzo Compartido nos gusta conocer al otro, comprender quién es esa persona que viene a trabajar al mismo lugar que tú. Pueden conversar de cualquier cosa: el Giro d'Italia, los carros que se conducen solos o su libro favorito.
+Toma tú la iniciativa y saluda primero:    
+
+${leftUser.email}
+${rightUser.email}
+
+A partir de este momento quedan en contacto para ir a almorzar juntos.
+
+PD: Recuerda que si llegaste a Yuxi en el último mes, tú y tu pareja tendrán un almuerzo GRATUITO!. Si aplicas déjanoslo saber para explicarte las condiciones.
+
+¡Un saludo!
+Juan Herrera
+Con el Apoyo de Yuxi Global`;
     }
 
     isIn(user: User): boolean {

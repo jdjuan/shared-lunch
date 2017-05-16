@@ -1,3 +1,7 @@
+<textarea class="text-left" name="" id="" cols="230" rows="20">
+  {{userService.template}}
+</textarea>
+
 <div *ngIf="userService.users">
   <!--BUTTONS-->
   <div>
@@ -40,6 +44,7 @@
                 <button [disabled]="!user.active || !user.currentMatch || user.matchConfirmed" [class.btn-success]="user.active" class="btn"
                   (click)="userService.confirmMatch(user)">Confirm</button>
                 <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-danger]="user.active" class="btn" (click)="userService.unconfirmMatch(user)">Unconfirm</button>
+                <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-info]="user.active" class="btn" (click)="userService.generateTemplate(user)">Email</button>
                 <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-warning]="user.active" class="btn" (click)="userService.settleMatch(user)">Settle</button>
               </td>
             </ng-container>
