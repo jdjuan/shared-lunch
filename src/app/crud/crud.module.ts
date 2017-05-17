@@ -1,3 +1,5 @@
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CrudComponent } from './crud/crud.component';
@@ -7,7 +9,9 @@ import { FiltersComponent } from './filters/filters.component';
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    BrowserModule,
+    FormsModule
   ],
   declarations: [CrudComponent, DropdownComponent, MatToIterablePipe, FiltersComponent],
   exports: [CrudComponent]

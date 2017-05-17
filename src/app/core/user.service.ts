@@ -33,6 +33,7 @@ export class UserService {
     generateTemplate(leftUser: User) {
         const rightUser: User = this.getUserById(leftUser.currentMatch);
         this.template = `
+¡Nuevo Almuerzo Compartido!
 Hola ${leftUser.firstName} y ${rightUser.firstName},
 
 ¡Ustedes tendrán un almuerzo compartido! Woohoo!
@@ -40,7 +41,7 @@ Hola ${leftUser.firstName} y ${rightUser.firstName},
 En Almuerzo Compartido nos gusta conocer al otro, comprender quién es esa persona que viene a trabajar al mismo lugar que tú. Pueden conversar de cualquier cosa: el Giro d'Italia, los carros que se conducen solos o su libro favorito.
 Toma tú la iniciativa y saluda primero:    
 
-${leftUser.email}
+${leftUser.email} 
 ${rightUser.email}
 
 A partir de este momento quedan en contacto para ir a almorzar juntos.

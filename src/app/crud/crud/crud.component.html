@@ -1,6 +1,4 @@
-<textarea class="text-left" name="" id="" cols="230" rows="20">
-  {{userService.template}}
-</textarea>
+<textarea class="text-left" name="" id="" cols="230" rows="20" [(ngModel)]="userService.template"></textarea>
 
 <div *ngIf="userService.users">
   <!--BUTTONS-->
