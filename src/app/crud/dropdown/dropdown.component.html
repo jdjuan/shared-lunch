@@ -1,0 +1,5 @@
+<select *ngIf="users">
+  <option *ngFor="let user of users | matToIterable">
+    {{user?.quantity + ': ' + user.instance?.getFullName()}}
+  </option>
+</select>
