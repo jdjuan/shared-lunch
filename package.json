@@ -1,16 +1,20 @@
 {
-  "name": "shared-lunch",
+  "name": "apiresttokens",
   "version": "1.0.0",
-  "description": "",
+  "description": "api rest with tokens for send emails",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "author": "",
+  "author": "Harlen ( h4isan)",
   "license": "ISC",
   "dependencies": {
-    "nodemailer": "^4.0.1",
-    "nodemailer-sendgrid-transport": "^0.2.0"
+    "body-parser": "^1.17.2",
+    "cors": "^2.8.3",
+    "express": "^4.15.3",
+    "jwt-simple": "^0.5.1",
+    "moment": "^2.18.1",
+    "nodemailer": "^4.0.1"
   }
 }
