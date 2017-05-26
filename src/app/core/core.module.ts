@@ -10,6 +10,13 @@ const firebaseConfig = {
   databaseURL: 'https://shared-lunch.firebaseio.com',
   storageBucket: 'shared-lunch.appspot.com',
   messagingSenderId: '44211415855'
+
+    // apiKey: "AIzaSyATXIzetlqqVm2kv96FeV0IzfQ-6Rh9WRs",
+    // authDomain: "shared-lunch-1efae.firebaseapp.com",
+    // databaseURL: "https://shared-lunch-1efae.firebaseio.com",
+    // projectId: "shared-lunch-1efae",
+    // storageBucket: "shared-lunch-1efae.appspot.com",
+    // messagingSenderId: "88873309460"  
 };
 
 @NgModule({

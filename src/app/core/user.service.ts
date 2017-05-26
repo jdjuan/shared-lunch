@@ -68,11 +68,7 @@ Con el Apoyo de Yuxi Global`;
                 this.db.object('/users/' + userLeft.$key).update({ 'currentMatch': userRight.$key });
                 this.db.object('/users/' + userRight.$key).update({ 'currentMatch': userLeft.$key });
             }
-        }
-    }
-
-    unmatchUser(userLeft: User) {
-        if (userLeft.currentMatch) {
+        } else if (userLeft.currentMatch) {
             const userRight: User = this.getUserById(userLeft.currentMatch);
             this.db.object('/users/' + userLeft.$key).update({ 'currentMatch': '' });
             this.db.object('/users/' + userRight.$key).update({ 'currentMatch': '' });
@@ -84,16 +80,11 @@ Con el Apoyo de Yuxi Global`;
     }
 
     confirmMatch(userLeft: User) {
+        const userRight: User = this.getUserById(userLeft.currentMatch);
         if (userLeft.currentMatch && !userLeft.matchConfirmed) {
-            const userRight: User = this.getUserById(userLeft.currentMatch);
             this.db.object('/users/' + userLeft.$key).update({ 'matchConfirmed': true });
             this.db.object('/users/' + userRight.$key).update({ 'matchConfirmed': true });
-        }
-    }
-
-    unconfirmMatch(userLeft: User) {
-        if (userLeft.currentMatch && userLeft.matchConfirmed) {
-            const userRight: User = this.getUserById(userLeft.currentMatch);
+        } else if (userLeft.currentMatch && userLeft.matchConfirmed) {
             this.db.object('/users/' + userLeft.$key).update({ 'matchConfirmed': false });
             this.db.object('/users/' + userRight.$key).update({ 'matchConfirmed': false });
         }
@@ -129,6 +120,10 @@ Con el Apoyo de Yuxi Global`;
             console.log('Cannot find user', id);
         }
         return user;
+    }
+
+    changeUserState(user: User) {
+        this.db.object('/users/' + user.$key).update({ 'active': !user.active });
     }
 
     onTransactionError(error, committed, snapshot) {
