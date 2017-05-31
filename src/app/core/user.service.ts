@@ -4,6 +4,9 @@ import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
 
+import { Http, Response, RequestOptions, Headers } from "@angular/http";
+import { AuthHttp } from 'angular2-jwt';
+import * as firebase from 'firebase';
 @Injectable()
 export class UserService {
 
@@ -13,7 +16,7 @@ export class UserService {
     cachedUsers: { [id: string]: User } = {};
     columns = ['#', 'Name', 'ID', 'Location', 'Match', 'Matches', 'Options'];
 
-    constructor(private db: AngularFireDatabase) {
+    constructor(private db: AngularFireDatabase, private authHttp: AuthHttp, private http: Http) {
         this.fetchUsers().subscribe((users: User[]) => {
             this.users = users;
             if (!this.filter) {
@@ -29,7 +32,44 @@ export class UserService {
             return userInstance;
         }));
     }
+    sendUsersLunches(leftUser: User) {
+        const headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        //headers.append('authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyX3h4IiwiaWF0IjoxNDk1MjE2NjA2LCJleHAiOjE0OTU0NzU4MDZ9.mOX1l7WquXcWG_W0M_2LdYWjx3xPy0rnJWzRDl9GxR8'); 
 
+
+
+        // firebase.auth().signInAnonymously().catch((error: any) => {
+        //     // Handle Errors here.
+        //     var errorCode = error.code;
+        //     var errorMessage = error.message;
+        //     // ...
+        // });
+        firebase.auth().signOut().then(function () {
+            console.log('Signed Out');
+        }, function (error) {
+            console.error('Sign Out Error', error);
+        });
+        firebase.auth().currentUser.getToken().then(data => {
+
+            const bodyHttp = {
+                "destemail1": "juan.herrera@yuxiglobal.com",
+                "destemail2": "harlen.giraldo@yuxiglobal.com",
+                "subject": "soy un subject",
+                "bodymessage": "<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>",
+                "uid": data
+            };
+            this.http.post(
+                'http://localhost:3000/api/validtoken',
+                bodyHttp
+            ).subscribe(
+                data => console.log(data),
+                err => console.log(err),
+                () => console.log('Request Complete'));
+        }).catch(function (error) {
+            // Handle error
+        });
+    }
     generateTemplate(leftUser: User) {
         const rightUser: User = this.getUserById(leftUser.currentMatch);
         this.template = `
