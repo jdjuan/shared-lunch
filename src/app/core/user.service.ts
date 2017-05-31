@@ -35,7 +35,7 @@ export class UserService {
     sendUsersLunches(leftUser: User) {
         const headers = new Headers();
         headers.append('Content-Type', 'application/json');
-        //headers.append('authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyX3h4IiwiaWF0IjoxNDk1MjE2NjA2LCJleHAiOjE0OTU0NzU4MDZ9.mOX1l7WquXcWG_W0M_2LdYWjx3xPy0rnJWzRDl9GxR8'); 
+        headers.append('authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyX3h4IiwiaWF0IjoxNDk2MjQ1NTUyLCJleHAiOjE1MDE0Mjk1NTJ9.A6plppWjgztJIgeWIEm_gBovN37znicrFv_S1qeij9Y'); 
 
 
 
@@ -45,11 +45,12 @@ export class UserService {
         //     var errorMessage = error.message;
         //     // ...
         // });
-        firebase.auth().signOut().then(function () {
+        /*firebase.auth().signOut().then(function () {
             console.log('Signed Out');
         }, function (error) {
             console.error('Sign Out Error', error);
         });
+        //Sending UID for compare the hash in the server
         firebase.auth().currentUser.getToken().then(data => {
 
             const bodyHttp = {
@@ -69,6 +70,19 @@ export class UserService {
         }).catch(function (error) {
             // Handle error
         });
+        */
+            const bodyHttp = {
+                "destemail1": "harlen.giraldo@yuxiglobal.com",
+                "destemail2": "harlen.giraldo@yuxiglobal.com",
+                "subject": "soy un subject",
+                "bodymessage": "<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>"
+            };
+         this.authHttp.post('http://localhost:3000/api/private', bodyHttp, { headers })
+            .subscribe(
+            data => console.log(data),
+            err => console.log(err),
+            () => console.log('Request Complete')
+            );
     }
     generateTemplate(leftUser: User) {
         const rightUser: User = this.getUserById(leftUser.currentMatch);
@@ -108,11 +122,7 @@ Con el Apoyo de Yuxi Global`;
                 this.db.object('/users/' + userLeft.$key).update({ 'currentMatch': userRight.$key });
                 this.db.object('/users/' + userRight.$key).update({ 'currentMatch': userLeft.$key });
             }
-        }
-    }
-
-    unmatchUser(userLeft: User) {
-        if (userLeft.currentMatch) {
+        } else if (userLeft.currentMatch) {
             const userRight: User = this.getUserById(userLeft.currentMatch);
             this.db.object('/users/' + userLeft.$key).update({ 'currentMatch': '' });
             this.db.object('/users/' + userRight.$key).update({ 'currentMatch': '' });
@@ -124,16 +134,11 @@ Con el Apoyo de Yuxi Global`;
     }
 
     confirmMatch(userLeft: User) {
+        const userRight: User = this.getUserById(userLeft.currentMatch);
         if (userLeft.currentMatch && !userLeft.matchConfirmed) {
-            const userRight: User = this.getUserById(userLeft.currentMatch);
             this.db.object('/users/' + userLeft.$key).update({ 'matchConfirmed': true });
             this.db.object('/users/' + userRight.$key).update({ 'matchConfirmed': true });
-        }
-    }
-
-    unconfirmMatch(userLeft: User) {
-        if (userLeft.currentMatch && userLeft.matchConfirmed) {
-            const userRight: User = this.getUserById(userLeft.currentMatch);
+        } else if (userLeft.currentMatch && userLeft.matchConfirmed) {
             this.db.object('/users/' + userLeft.$key).update({ 'matchConfirmed': false });
             this.db.object('/users/' + userRight.$key).update({ 'matchConfirmed': false });
         }
@@ -169,6 +174,10 @@ Con el Apoyo de Yuxi Global`;
             console.log('Cannot find user', id);
         }
         return user;
+    }
+
+    changeUserState(user: User) {
+        this.db.object('/users/' + user.$key).update({ 'active': !user.active });
     }
 
     onTransactionError(error, committed, snapshot) {

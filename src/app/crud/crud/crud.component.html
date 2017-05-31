@@ -1,13 +1,13 @@
-<textarea class="text-left" name="" id="" cols="230" rows="20" [(ngModel)]="userService.template"></textarea>
+<!--<textarea class="text-left" name="" id="" cols="230" rows="20" [(ngModel)]="userService.template"></textarea>-->
 
 <div *ngIf="userService.users">
   <!--BUTTONS-->
-  <div>
+  <!--<div>
     Generate:
     <button class="btn btn-success" (click)="userService.matchAllUsers()">Match All Users</button>
     <button class="btn btn-success" (click)="userService.confirmAllMatches()">Confirm All Matches</button>
     <button class="btn btn-success" (click)="userService.settleAllMatches()">Settle All Matches</button>
-  </div>
+  </div>-->
   <app-filters></app-filters>
   <!--TABLE-->
   <div class="col-md-12">
@@ -36,14 +36,18 @@
                 <app-dropdown *ngIf="user.matches" [matches]="user.matches"></app-dropdown>
               </td>
               <td class="text-center">
-                <button [disabled]="!user.active || user.currentMatch || user.matchConfirmed" [class.btn-primary]="user.active" class="btn" (click)="userService.matchUser(user)">Match</button>
-                <button [disabled]="!user.active || !user.currentMatch || user.matchConfirmed" [class.btn-danger]="user.active" class="btn"
-                  (click)="userService.unmatchUser(user)">Unmatch</button>
-                <button [disabled]="!user.active || !user.currentMatch || user.matchConfirmed" [class.btn-success]="user.active" class="btn"
-                  (click)="userService.confirmMatch(user)">Confirm</button>
-                <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-danger]="user.active" class="btn" (click)="userService.unconfirmMatch(user)">Unconfirm</button>
+                <button [disabled]="!user.active || user.matchConfirmed" [class.btn-primary]="!user.currentMatch && user.active" [class.btn-danger]="user.currentMatch && user.active" class="btn" (click)="userService.matchUser(user)">
+                    {{ (!user.currentMatch)  ? 'Match' : 'Unmatch' }}
+                  </button>
+                <button [disabled]="!user.active || !user.currentMatch " [class.btn-success]="!user.matchConfirmed && user.active" [class.btn-danger]="user.matchConfirmed && user.active"
+                  class="btn" (click)="userService.confirmMatch(user)">
+                  {{ user.matchConfirmed ? 'Unconfirm' : 'Confirm' }}
+                  </button>
                 <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-info]="user.active" class="btn" (click)="userService.sendUsersLunches(user)">Email</button>
                 <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-warning]="user.active" class="btn" (click)="userService.settleMatch(user)">Settle</button>
+                <button [class.btn-success]="!user.active" [class.btn-danger]="user.active" class="btn" (click)="userService.changeUserState(user)">
+                  {{ user.active ? 'Deactive' : 'Active'}}
+                </button>
               </td>
             </ng-container>
           </tr>
