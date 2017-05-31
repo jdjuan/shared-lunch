@@ -3,6 +3,13 @@ var moment = require('moment');
 var config = require('./config');
 
 exports.ensureAuthenticated = function(req, res, next) {  
+
+    var payload = {
+    sub: "user_xx",
+    iat: moment().unix(),
+    exp: moment().add(3, "days").unix(),
+  };
+  console.log(jwt.encode(payload, config.TOKEN_SECRET));
   if(!req.headers.authorization) {
     return res
       .status(403)
