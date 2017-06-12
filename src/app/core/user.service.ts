@@ -3,6 +3,7 @@ import { User } from './user';
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 import { Http, Response, RequestOptions, Headers } from "@angular/http";
 import { AuthHttp } from 'angular2-jwt';
@@ -16,7 +17,7 @@ export class UserService {
     cachedUsers: { [id: string]: User } = {};
     columns = ['#', 'Name', 'ID', 'Location', 'Match', 'Matches', 'Options'];
 
-    constructor(private db: AngularFireDatabase, private authHttp: AuthHttp, private http: Http) {
+    constructor(private db: AngularFireDatabase, private authHttp: AuthHttp, private http: Http, private auth: AngularFireAuth) {
         this.fetchUsers().subscribe((users: User[]) => {
             this.users = users;
             if (!this.filter) {
@@ -33,28 +34,12 @@ export class UserService {
         }));
     }
     sendUsersLunches(leftUser: User) {
-        const headers = new Headers();
-        headers.append('Content-Type', 'application/json');
-        headers.append('authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyX3h4IiwiaWF0IjoxNDk2MjQ1NTUyLCJleHAiOjE1MDE0Mjk1NTJ9.A6plppWjgztJIgeWIEm_gBovN37znicrFv_S1qeij9Y'); 
 
-
-
-        // firebase.auth().signInAnonymously().catch((error: any) => {
-        //     // Handle Errors here.
-        //     var errorCode = error.code;
-        //     var errorMessage = error.message;
-        //     // ...
-        // });
-        /*firebase.auth().signOut().then(function () {
-            console.log('Signed Out');
-        }, function (error) {
-            console.error('Sign Out Error', error);
-        });
         //Sending UID for compare the hash in the server
         firebase.auth().currentUser.getToken().then(data => {
 
             const bodyHttp = {
-                "destemail1": "juan.herrera@yuxiglobal.com",
+                "destemail1": "harlen.giraldo@yuxiglobal.com",
                 "destemail2": "harlen.giraldo@yuxiglobal.com",
                 "subject": "soy un subject",
                 "bodymessage": "<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>",
@@ -70,19 +55,22 @@ export class UserService {
         }).catch(function (error) {
             // Handle error
         });
-        */
-            const bodyHttp = {
-                "destemail1": "harlen.giraldo@yuxiglobal.com",
-                "destemail2": "harlen.giraldo@yuxiglobal.com",
-                "subject": "soy un subject",
-                "bodymessage": "<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>"
-            };
-         this.authHttp.post('http://localhost:3000/api/private', bodyHttp, { headers })
-            .subscribe(
-            data => console.log(data),
-            err => console.log(err),
-            () => console.log('Request Complete')
-            );
+        // const headers = new Headers();
+        // headers.append('Content-Type', 'application/json');
+        // headers.append('authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyX3h4IiwiaWF0IjoxNDk2MjQ1NTUyLCJleHAiOjE1MDE0Mjk1NTJ9.A6plppWjgztJIgeWIEm_gBovN37znicrFv_S1qeij9Y'); 
+
+        //     const bodyHttp = {
+        //         "destemail1": "harlen.giraldo@yuxiglobal.com",
+        //         "destemail2": "harlen.giraldo@yuxiglobal.com",
+        //         "subject": "soy un subject",
+        //         "bodymessage": "<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>"
+        //     };
+        //  this.authHttp.post('http://localhost:3000/api/private', bodyHttp, { headers })
+        //     .subscribe(
+        //     data => console.log(data),
+        //     err => console.log(err),
+        //     () => console.log('Request Complete')
+        //     );
     }
     generateTemplate(leftUser: User) {
         const rightUser: User = this.getUserById(leftUser.currentMatch);

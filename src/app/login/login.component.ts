@@ -9,26 +9,34 @@ import { Router } from '@angular/router';
 export class LoginComponent implements OnInit {
   state: string = '';
   error: any;
-  constructor( private router: Router) {
+  constructor(private router: Router, public authf: AngularFireAuth) {
 
-    // if (authf.authState) {
-    //   this.router.navigateByUrl('/members');
-    // }
+    if (authf.authState) {
+      this.router.navigateByUrl('/crud');
+    }
 
   }
 
   ngOnInit() {
   }
-  // onSubmit(formData: any) {
-  //   if (formData.valid) {
-  //     console.log(formData.value);
-  //     this.authf.auth.signInWithEmailAndPassword("user", "password").catch( (error: any) => {
-  //       const errorCode = error.code;
-  //       const errorMessage = error.message;
-  //       console.log("login failed errorCode: " + errorCode);
-  //       console.log("login failed errorMessage: " + errorMessage);
-  //     });
+  onSubmit(formData: any) {
+    if (formData.valid) {
 
-  //   }
-  // }
+      this.authf.auth.signInWithEmailAndPassword("harlengiraldo@gmail.com", "password").catch((error: any) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log("Creating failed errorCode: " + errorCode);
+        console.log("Creating failed errorMessage: " + errorMessage);
+        this.authf.auth.createUserWithEmailAndPassword("harlengiraldo@gmail.com", "password").catch(
+          (error: any) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log("Loginieando failed errorCode: " + errorCode);
+            console.log("Loginieando failed errorMessage: " + errorMessage);
+          }
+        )
+      });
+
+    }
+  }
 }
