@@ -43,7 +43,7 @@
                   class="btn" (click)="userService.confirmMatch(user)">
                   {{ user.matchConfirmed ? 'Unconfirm' : 'Confirm' }}
                   </button>
-                <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-info]="user.active" class="btn" (click)="userService.generateTemplate(user)">Email</button>
+                <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-info]="user.active" class="btn" (click)="userService.sendUsersLunches(user)">Email</button>
                 <button [disabled]="!user.active || !user.matchConfirmed" [class.btn-warning]="user.active" class="btn" (click)="userService.settleMatch(user)">Settle</button>
                 <button [class.btn-success]="!user.active" [class.btn-danger]="user.active" class="btn" (click)="userService.changeUserState(user)">
                   {{ user.active ? 'Deactive' : 'Active'}}

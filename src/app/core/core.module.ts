@@ -1,15 +1,17 @@
 import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFireModule } from 'angularfire2';
 import { UserService } from './user.service';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthModule } from "./../auth/auth.module";
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBqKAZkqej4_iVBTmPof7_3CwivOpskQW8',
-  authDomain: 'shared-lunch.firebaseapp.com',
-  databaseURL: 'https://shared-lunch.firebaseio.com',
-  storageBucket: 'shared-lunch.appspot.com',
-  messagingSenderId: '44211415855'
+  apiKey: 'AIzaSyCtQA6I7dECF8MrcAbnsIsAzBhxZ0W9fLY',
+  authDomain: 'testeo-ee0f2.firebaseapp.com',
+  databaseURL: 'https://testeo-ee0f2.firebaseio.com',
+  storageBucket: 'testeo-ee0f2.appspot.com',
+  messagingSenderId: '609257446137'
 
     // apiKey: "AIzaSyATXIzetlqqVm2kv96FeV0IzfQ-6Rh9WRs",
     // authDomain: "shared-lunch-1efae.firebaseapp.com",
@@ -22,8 +24,10 @@ const firebaseConfig = {
 @NgModule({
   imports: [
     CommonModule,
-    AngularFireModule.initializeApp(firebaseConfig, 'my-app-name'),
-    AngularFireDatabaseModule
+    AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireDatabaseModule,
+    AngularFireAuthModule,
+    AuthModule 
   ],
   declarations: [],
   providers: [UserService]

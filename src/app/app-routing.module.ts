@@ -1,11 +1,13 @@
 import { CrudComponent } from './crud/crud/crud.component';
+import { LoginComponent } from './login/login.component';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { RouterModule, Routes } from '@angular/router';
-
+import { AuthGuard } from './auth/auth.service';
 const routes: Routes = [
-    { path: '', component: CrudComponent },
-    // { path: '**', component: PageNotFoundComponent },
+    { path: '', redirectTo: 'crud', pathMatch: 'full' },
+    { path: 'login', component: LoginComponent },
+    { path: 'crud', component: CrudComponent ,  canActivate: [AuthGuard]}
 ];
 
 @NgModule({

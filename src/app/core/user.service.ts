@@ -3,6 +3,9 @@ import { User } from './user';
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
+import { AngularFireAuth } from 'angularfire2/auth';
+
+import { Http, Response, RequestOptions, Headers } from '@angular/http';
 
 @Injectable()
 export class UserService {
@@ -13,7 +16,7 @@ export class UserService {
     cachedUsers: { [id: string]: User } = {};
     columns = ['#', 'Name', 'ID', 'Location', 'Match', 'Matches', 'Options'];
 
-    constructor(private db: AngularFireDatabase) {
+    constructor(private db: AngularFireDatabase, private http: Http, private angularFireAuth: AngularFireAuth) {
         this.fetchUsers().subscribe((users: User[]) => {
             this.users = users;
             if (!this.filter) {
@@ -30,6 +33,26 @@ export class UserService {
         }));
     }
 
+    sendUsersLunches(leftUser: User) {
+        this.angularFireAuth.auth.currentUser.getToken().then(token => {
+            const bodyHttp = {
+                'destemail1': 'juan.herrera@yuxiglobal.com',
+                'destemail2': 'harlen.giraldo@yuxiglobal.com',
+                'subject': 'soy un subject',
+                'bodymessage': '<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>',
+                'uid': token
+            };
+            this.http.post(
+                'http://localhost:3000/api/validtoken',
+                bodyHttp
+            ).subscribe(
+                success => console.log(success),
+                err => console.log(err),
+                () => console.log('Request Complete'));
+        }).catch(function (error) {
+            console.log('couldnt get user token');
+        });
+    }
     generateTemplate(leftUser: User) {
         const rightUser: User = this.getUserById(leftUser.currentMatch);
         this.template = `
