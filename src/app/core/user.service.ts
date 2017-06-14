@@ -5,9 +5,8 @@ import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
 
-import { Http, Response, RequestOptions, Headers } from "@angular/http";
-import { AuthHttp } from 'angular2-jwt';
-import * as firebase from 'firebase';
+import { Http, Response, RequestOptions, Headers } from '@angular/http';
+
 @Injectable()
 export class UserService {
 
@@ -17,7 +16,7 @@ export class UserService {
     cachedUsers: { [id: string]: User } = {};
     columns = ['#', 'Name', 'ID', 'Location', 'Match', 'Matches', 'Options'];
 
-    constructor(private db: AngularFireDatabase, private authHttp: AuthHttp, private http: Http, private auth: AngularFireAuth) {
+    constructor(private db: AngularFireDatabase, private http: Http, private angularFireAuth: AngularFireAuth) {
         this.fetchUsers().subscribe((users: User[]) => {
             this.users = users;
             if (!this.filter) {
@@ -33,44 +32,26 @@ export class UserService {
             return userInstance;
         }));
     }
+
     sendUsersLunches(leftUser: User) {
-
-        //Sending UID for compare the hash in the server
-        firebase.auth().currentUser.getToken().then(data => {
-
+        this.angularFireAuth.auth.currentUser.getToken().then(token => {
             const bodyHttp = {
-                "destemail1": "harlen.giraldo@yuxiglobal.com",
-                "destemail2": "harlen.giraldo@yuxiglobal.com",
-                "subject": "soy un subject",
-                "bodymessage": "<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>",
-                "uid": data
+                'destemail1': 'juan.herrera@yuxiglobal.com',
+                'destemail2': 'harlen.giraldo@yuxiglobal.com',
+                'subject': 'soy un subject',
+                'bodymessage': '<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>',
+                'uid': token
             };
             this.http.post(
                 'http://localhost:3000/api/validtoken',
                 bodyHttp
             ).subscribe(
-                data => console.log(data),
+                success => console.log(success),
                 err => console.log(err),
                 () => console.log('Request Complete'));
         }).catch(function (error) {
-            // Handle error
+            console.log('couldnt get user token');
         });
-        // const headers = new Headers();
-        // headers.append('Content-Type', 'application/json');
-        // headers.append('authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyX3h4IiwiaWF0IjoxNDk2MjQ1NTUyLCJleHAiOjE1MDE0Mjk1NTJ9.A6plppWjgztJIgeWIEm_gBovN37znicrFv_S1qeij9Y'); 
-
-        //     const bodyHttp = {
-        //         "destemail1": "harlen.giraldo@yuxiglobal.com",
-        //         "destemail2": "harlen.giraldo@yuxiglobal.com",
-        //         "subject": "soy un subject",
-        //         "bodymessage": "<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>"
-        //     };
-        //  this.authHttp.post('http://localhost:3000/api/private', bodyHttp, { headers })
-        //     .subscribe(
-        //     data => console.log(data),
-        //     err => console.log(err),
-        //     () => console.log('Request Complete')
-        //     );
     }
     generateTemplate(leftUser: User) {
         const rightUser: User = this.getUserById(leftUser.currentMatch);
