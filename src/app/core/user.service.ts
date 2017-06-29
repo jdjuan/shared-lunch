@@ -1,11 +1,11 @@
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { User } from './user';
 import { Injectable } from '@angular/core';
-import 'rxjs/add/operator/map';
-import { Observable } from 'rxjs/Observable';
-import { AngularFireAuth } from 'angularfire2/auth';
-
 import { Http, Response, RequestOptions, Headers } from '@angular/http';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
 @Injectable()
 export class UserService {
@@ -35,11 +35,12 @@ export class UserService {
 
     sendUsersLunches(leftUser: User) {
         this.angularFireAuth.auth.currentUser.getToken().then(token => {
+            console.log('token',token);
             const bodyHttp = {
-                'destemail1': 'juan.herrera@yuxiglobal.com',
-                'destemail2': 'harlen.giraldo@yuxiglobal.com',
+                'userLeft': 'juan.herrera@yuxiglobal.com',
+                'userRight': 'david.juanherrera@gmail.com',
                 'subject': 'soy un subject',
-                'bodymessage': '<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>',
+                'text': '<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>',
                 'uid': token
             };
             this.http.post(

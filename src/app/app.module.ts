@@ -9,7 +9,8 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { LoginComponent } from './login/login.component';
-import { AuthGuard } from './auth/auth.service';
+import { AuthGuard } from './core/guard.service';
+
 @NgModule({
   declarations: [
     AppComponent,
