@@ -1,11 +1,7 @@
-// server.js
 var express = require('express');
 var bodyParser = require('body-parser');
 var cors = require('cors');
-var auth = require('./auth');
-var middleware = require('./middleware');
 var admin = require("firebase-admin");
-
 
 var app = express();
 app.use(bodyParser.json());
@@ -20,7 +16,6 @@ admin.initializeApp({
 });
 
 var nodemailer = require('nodemailer');
-
 var emailConf = nodemailer.createTransport({
     service: 'gmail',
     port: '465',
@@ -32,50 +27,28 @@ var emailConf = nodemailer.createTransport({
 });
 
 var router = express.Router();
-
 router.post('/validtoken', function (req, res) {
-    console.log(req.body);
+    console.log(req.body.userLeft, req.body.userRight);
     admin.auth().verifyIdToken(req.body.uid)
         .then(function (decodedToken) {
-            var uid = decodedToken.uid;
-            res.json({ message: uid });
             emailConf.sendMail({
                 from: 'SharedLunch <sharedlunchv3@gmail.com>',
-                to: req.body.destemail1 + '<' + req.body.destemail1 + '>,' + req.body.destemail2 + ' <' + req.body.destemail2 + '>',
+                to: req.body.userLeft + '<' + req.body.userLeft + '>,' + req.body.userRight + ' <' + req.body.userRight + '>',
                 subject: req.body.subject,
-                html: '<div>👻' + req.body.bodymessage + '</div>',
+                html: '<div>👻' + req.body.text + '</div>',
             }, function (err) {
-                if (err)
+                if (err) {
                     throw err;
-
+                }
                 console.log('E-mail enviado!');
             });
-            
+
         }).catch(function (error) {
-            res.json({ message: 'upsii' });
+            res.json({ error: error });
         });
 
 });
 
-
-router.post('/private', middleware.ensureAuthenticated, function (req, res) {
-    res.json({ message: 'your email was send! ' });
-    emailConf.sendMail({
-        from: 'SharedLunch <sharedlunchv3@gmail.com>',
-        to: req.body.destemail1 + '<' + req.body.destemail1 + '>,' + req.body.destemail2 + ' <' + req.body.destemail2 + '>',
-        subject: req.body.subject,
-        html: '<div>👻' + req.body.bodymessage + '</div>',
-    }, function (err) {
-        if (err)
-            throw err;
-
-        console.log('E-mail enviado!');
-    });
-
-
-});
-
 app.use('/api', router);
-
 app.listen(app.get('port'));
-console.log('Magic happens on port ' + app.get('port'));
+console.log('Listening on port ' + app.get('port'));
