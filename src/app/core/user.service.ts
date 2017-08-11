@@ -25,6 +25,19 @@ export class UserService {
         });
     }
 
+    addUsers() {
+        const users = this.db.list('/users');
+        users.push({
+            'active': true,
+            'currentMatch': '',
+            'email': 'milena.mora@yuxiglobal.com',
+            'firstName': 'Milena',
+            'lastName': 'Mora',
+            'location': 1,
+            'matchConfirmed': false,
+            'matches': ''});
+    }
+
     fetchUsers(): Observable<[User]> {
         return this.db.list('/users').map((users: User[]) => users.map((user: User) => {
             const userInstance = User.createUser(user);
@@ -35,12 +48,12 @@ export class UserService {
 
     sendUsersLunches(leftUser: User) {
         this.angularFireAuth.auth.currentUser.getToken().then(token => {
-            console.log('token',token);
+            const rightUser = this.getUserById(leftUser.currentMatch);
             const bodyHttp = {
-                'userLeft': 'juan.herrera@yuxiglobal.com',
-                'userRight': 'david.juanherrera@gmail.com',
-                'subject': 'soy un subject',
-                'text': '<h1>soy el titulo de la cabecera </h1> <p> harlen 👻 😞 </p>',
+                'userLeft': leftUser.email,
+                'userRight': rightUser.email,
+                'subject': '🎉🎉 ¡Nuevo Almuerzo Compartido! 🎉🎉',
+                'text': this.getTemplate(leftUser, rightUser),
                 'uid': token
             };
             this.http.post(
@@ -54,27 +67,35 @@ export class UserService {
             console.log('couldnt get user token');
         });
     }
+
+    getTemplate(leftUser: User, rightUser: User) {
+        return `<h1>🎈 ¡Tienes un nuevo almuerzo compartido! 🎈</h1>
+            <p>
+            Hola ${leftUser.firstName} y ${rightUser.firstName}, <br><br>
+
+            ¡Ustedes tendrán un almuerzo compartido! Ésta es su oportunidad de conocer al otro, saber cuál es su labor en Yuxi, de dónde es, o qué música le gusta 😊 A veces somos tímidos o simplemente no tenemos tiempo. Con Almuerzo Compartido tendrás una excusa para compartir 😃<br><br>
+
+            Pueden hablar de muchos temas, por ejemplo el conflicto entre Corea del Norte y Estados Unidos, este maravilloso <a href="https://vimeo.com/225045336">corto</a> sobre los secretos de pareja o su música favorita. 😄
+            </p>
+            <h2>Toma tú la iniciativa y saluda primero:</h2>
+
+            <h3>${leftUser.email}</h3>
+            <h3>${rightUser.email}</h3>
+    
+            <p>
+            A partir de este momento quedan en contacto para ir a almorzar juntos. Pueden ir cualquier día, pero no dejes que pase mucho tiempo! 😲<br><br>
+
+            PD: Recuerda que si llegaste a Yuxi en el último mes, tú y tu pareja tendrán un almuerzo GRATUITO! Si aplicas déjanoslo saber para explicarte las condiciones.<br><br>
+
+            ¡Un saludo!<br>
+            Juan Herrera<br><br>
+            Con el Apoyo de Yuxi Global
+            </p>`;
+    }
+
     generateTemplate(leftUser: User) {
         const rightUser: User = this.getUserById(leftUser.currentMatch);
-        this.template = `
-¡Nuevo Almuerzo Compartido!
-Hola ${leftUser.firstName} y ${rightUser.firstName},
-
-¡Ustedes tendrán un almuerzo compartido! Woohoo!
-
-En Almuerzo Compartido nos gusta conocer al otro, comprender quién es esa persona que viene a trabajar al mismo lugar que tú. Pueden conversar de cualquier cosa: el Giro d'Italia, los carros que se conducen solos o su libro favorito.
-Toma tú la iniciativa y saluda primero:    
-
-${leftUser.email} 
-${rightUser.email}
-
-A partir de este momento quedan en contacto para ir a almorzar juntos.
-
-PD: Recuerda que si llegaste a Yuxi en el último mes, tú y tu pareja tendrán un almuerzo GRATUITO!. Si aplicas déjanoslo saber para explicarte las condiciones.
-
-¡Un saludo!
-Juan Herrera
-Con el Apoyo de Yuxi Global`;
+        this.template = ``;
     }
 
     isIn(user: User): boolean {
